@@ -1,17 +1,17 @@
 package io.ryanwebb.model;
 
 public class GithubJobData {
-	public String id;
-	public String type;
-	public String url;
-	public String created_at;
-	public String company;
-	public String company_url;
-	public String location;
-	public String title;
-	public String description;
-	public String how_to_apply;
-	public String company_logo;
+	private String id;
+	private String type;
+	private String url;
+	private String created_at;
+	private String company;
+	private String company_url;
+	private String location;
+	private String title;
+	private String description;
+	private String how_to_apply;
+	private String company_logo;
 	
 	public String getId()
 	{

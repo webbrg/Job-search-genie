@@ -7,9 +7,15 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpServlet;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.ryanwebb.exceptions.GitHubApiException;
 
 public class GithubJobFinder extends HttpServlet implements JobFinder
 {
@@ -18,9 +24,10 @@ public class GithubJobFinder extends HttpServlet implements JobFinder
 	private String httpsURL = "https://jobs.github.com/positions.json";
     
 	@Override
-    public String findjobsByCity(final String city)
+    public List<GithubJobData> findjobsByCity(final String city)
+    throws GitHubApiException
     {
-		String retVal = null;
+		List<GithubJobData> retVal = null;
 		httpsURL += "?location="+city;
     	try 
     	{
@@ -37,23 +44,38 @@ public class GithubJobFinder extends HttpServlet implements JobFinder
             	//System.out.println(inputLine);
     			sb.append(inputLine);
     		}
-    		
-    		retVal = sb.toString();
     		br.close();
+    		// JSON string to POJO conversion
+    		List<GithubJobData> jobs = new ObjectMapper().readValue(sb.toString(), new TypeReference<List<GithubJobData>>(){});
+    		
+    		if (jobs.size() == 0)
+    		{
+    			GithubJobData data = new GithubJobData();
+    			data.setUrl("index.jsp");
+    			data.setCompany("No job vacancies");
+    			data.setDescription("");
+    			jobs.add(data);
+    		}
+    		
+    		retVal = jobs;
 		} 
     	catch (MalformedURLException e) 
     	{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (ProtocolException e) 
+		} 
+    	catch (ProtocolException e) 
     	{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (IOException e) 
+		} 
+    	catch (IOException e) 
     	{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw new GitHubApiException(e.getMessage());
 		}
+    	catch(Exception e)
+    	{
+    		throw new GitHubApiException(e.getMessage());
+    	}
     	
     	return retVal;
     }
@@ -63,7 +85,7 @@ public class GithubJobFinder extends HttpServlet implements JobFinder
 	 * @link {@link #JobFinder#findJobsByJobDescription(String) findJobsByJobDescription} method.
 	 */
 	@Override
-	public String findJobsByJobDescription(String jobDescription) 
+	public List<GithubJobData> findJobsByJobDescription(String jobDescription) 
 	{
 		throw new java.lang.UnsupportedOperationException("Not implemented!  For demonstration purposes only!");
 	}
@@ -73,22 +95,9 @@ public class GithubJobFinder extends HttpServlet implements JobFinder
 	 * @link {@link #JobFinder#findJobsByJobDescriptionAndCity(String, String) findJobsByJobDescriptionAndCity} method.
 	 */
 	@Override
-	public String findJobsByJobDescriptionAndCity(String jobDesc, String city) 
+	public List<GithubJobData> findJobsByJobDescriptionAndCity(String jobDesc, String city) 
 	{
 		throw new java.lang.UnsupportedOperationException("Not implemented!  For demonstration purposes only!");
 	}
 	
-//	public static void main(String[] args) throws Exception{
-//		String retVal = new GithubJobFinder().findjobsByCity(null);
-//		List<GithubJobData> unfilteredJobs = new ObjectMapper().readValue(retVal, new TypeReference<List<GithubJobData>>(){});
-//		System.out.println("retVal : " + retVal);
-//		System.out.println(unfilteredJobs.size());
-//		for (GithubJobData data : unfilteredJobs)
-//		{	
-//			System.out.println("Title:" + data.getTitle());
-//			System.out.println("Location:" + data.getLocation());
-//			// just check the first one!
-//			//break;
-//		}
-//	}
 }
