@@ -17,15 +17,5 @@
 		<servlet-name>spring</servlet-name>
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>    
-
-  <servlet>
-    <servlet-name>FindJobs</servlet-name>
-    <servlet-class>io.ryanwebb.controller.FindJobsServlet</servlet-class>
-  </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>FindJobs</servlet-name>
-    <url-pattern>/findjobs</url-pattern>
-  </servlet-mapping>
 </web-app>
 <!--      -->
